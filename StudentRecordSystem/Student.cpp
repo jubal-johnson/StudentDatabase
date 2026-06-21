@@ -1,239 +1,270 @@
 #include "Student.h"
 
-// ================= LOAD =================
-// Reads student text file data into the array until full
+// ================== DISPLAY ==================
+void displayStudents(Student students[], int count)
+{
+    cout << "\nID\tLName\t\tFName\t\t";
+
+    for (int j = 0; j < NUM_ASSIGNMENTS; j++)
+        cout << "A" << j + 1 << "\t";
+
+    cout << "AVG\tC1\tC2\tC3\n";
+
+    for (int i = 0; i < count; i++)
+    {
+        cout << students[i].id << "\t"
+            << students[i].lastName << "      \t"
+            << students[i].firstName << "      \t";
+
+        for (int j = 0; j < NUM_ASSIGNMENTS; j++)
+            cout << students[i].assignments[j] << "\t";
+
+        cout << students[i].average << "\t";
+
+        for (int j = 0; j < NUM_COURSES; j++)
+            cout << students[i].courses[j] << "\t";
+
+        cout << endl;
+    }
+}
+
+// ================= Load Students =================
 void loadStudents(Student students[], int& count)
 {
-    ifstream inputFile("students.txt");
+    ifstream inputFile("Students90.txt");
 
-    while (count < MAX_STUDENTS &&
+    while (count < STUDENT_MAX &&
         inputFile >> students[count].firstName
         >> students[count].lastName
-        >> students[count].id
-        >> students[count].grade)
+        >> students[count].id)
     {
+        for (int i = 0; i < NUM_ASSIGNMENTS; i++)
+        {
+            inputFile >> students[count].assignments[i];
+        }
+        
+        inputFile >> students[count].average;
+
+        for (int i = 0; i < NUM_COURSES; i++)
+        {
+            inputFile >> students[count].courses[i];
+        }
+
         count++;
     }
 
     inputFile.close();
 }
 
-// ================= DISPLAY ALL STUDENT INFO =================
-// Prints headers and loops through arrays to display all records and grades
-void displayAllStudentInfo(double grades[][NUM_ASSIGNMENTS], Student students[], int count)
+// ================= Search by Course =================
+void searchByCourse(Student students[], int count)
 {
-    cout << "\n===== ALL STUDENT RECORDS =====\n";
-    cout << "\033[31m" << "ID\tFName\t\tLName\t\t";
+    string course;
+    bool found = false;
 
-    for (int j = 0; j < NUM_ASSIGNMENTS; j++)
-    {
-        cout << "A" << (j + 1) << "\t";
-    }
-    cout << "AVG \033[0m\n";
-
+    cout << "Enter the course: ";
+    cin >> course;
+    cout << endl;
     for (int i = 0; i < count; i++)
     {
-        cout << students[i].id << "\t"
-            << students[i].firstName << "      \t"
-            << students[i].lastName << "      \t";
-
-        for (int j = 0; j < NUM_ASSIGNMENTS; j++)
+        for (int j = 0; j < NUM_COURSES; j++)
         {
-            cout << grades[i][j] << "\t";
+            if (students[i].courses[j] == course)
+            {
+                cout << students[i].id << "\t"
+                    << students[i].firstName << "\t"
+                    << students[i].lastName << endl;
+                found = true;
+            }
         }
-
-        cout << students[i].grade << endl;
+    }
+    
+    if (!found)
+    {
+        cout << "\nNo students enrolled in this program.\n";
     }
 }
 
-// ================= GENERATE GRADES =================
-// Fills the 2D array with random grade percentages between 60 and 100
-void generateGrades(double grades[][NUM_ASSIGNMENTS], int count)
+// ================= Show Assignment Average =================
+void showAssignmentAverage(Student students[], int count)
+{
+    double total[NUM_ASSIGNMENTS] = { 0 };
+
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
+    {
+        for (int j = 0; j < count; j++)
+        {
+            total[i] += students[j].assignments[i];
+        }
+    }
+
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
+    {
+        cout << "A"<<i+1<<": " << total[i] / count << endl;
+    }
+}
+
+// ================= Show Hardest Assignment =================
+void showHardestAssignment(Student students[], int count)
+{
+    int assignment=1;
+    double total[NUM_ASSIGNMENTS] = { 0 }, avg[NUM_ASSIGNMENTS], lowest;
+
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
+    {
+        for (int j = 0; j < count; j++)
+        {
+            total[i] += students[j].assignments[i];
+        }
+        avg[i] = total[i] / count;
+    }
+
+    lowest = avg[0];
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
+    {
+            if (lowest > avg[i])
+            {
+                lowest = avg[i];
+                assignment = i + 1;
+            }
+    }
+    cout << "Hardest: A" << assignment << " (" << lowest << ")\n\n";
+}
+
+// ================= Course Enrollment =================
+void courseEnrollment(Student students[], int count)
+{
+    int courseCount[10] = { 0 };
+
+    for(int i = 0; i < count; i++)
+    {
+        for (int j = 0; j < NUM_COURSES ; j++)
+        {
+            if (students[i].courses[j] == "COMP220")
+            {
+                courseCount[0]++;
+            }
+            else if (students[i].courses[j] == "MATH102")
+            {
+                courseCount[1]++;
+            }
+            else if (students[i].courses[j] == "STAT110")
+            {
+                courseCount[2]++;
+            }
+            else if (students[i].courses[j] == "ENGL150")
+            {
+                courseCount[3]++;
+            }
+            else if (students[i].courses[j] == "HIST210")
+            {
+                courseCount[4]++;
+            }
+            else if (students[i].courses[j] == "BIOL120")
+            {
+                courseCount[5]++;
+            }
+            else
+            {
+                courseCount[6]++;
+            }
+        }
+    }
+
+    cout << "\nCOMP220: " << courseCount[0]
+        << "\nMATH102: " << courseCount[1]
+        << "\nSTAT110: " << courseCount[2]
+        << "\nENGL150: " << courseCount[3]
+        << "\nHIST210: " << courseCount[4]
+        << "\nBIOL120: " << courseCount[5]
+        << "\nCSCI101: " << courseCount[6] << "\n";
+
+}
+
+void atRiskStudents(Student students[], int count)
 {
     for (int i = 0; i < count; i++)
     {
-        for (int j = 0; j < NUM_ASSIGNMENTS; j++)
+        if (students[i].average >= 50 && students[i].average < 60)
         {
-            grades[i][j] = rand() % 41 + 60;
+            for (int j = 0; j < NUM_ASSIGNMENTS; j++)
+            {
+                if (students[i].assignments[j] < 50)
+                {
+                    cout << students[i].id << "\t" << students[i].firstName << "\t" << students[i].lastName << endl;
+                    j = NUM_ASSIGNMENTS;
+                }
+            }
+        }
+    }
+    cout << endl;
+}
+
+// ================= Sort By Average =================
+void sortByAverage(Student students[], int count)
+{
+    for (int i = 0; i < count-1; i++)
+    {
+        for (int j = i+1; j < count; j++)
+        {
+            if (students[i].average < students[j].average)
+            {
+                swap(students[i], students[j]);
+            }
         }
     }
 }
 
-// ================= CALCULATE AVERAGES =================
-// Computes row averages from the 2D grades array and saves them to the struct
-void calculateAverages(double grades[][NUM_ASSIGNMENTS], Student students[], int count)
+
+// ================= Add Student =================
+void addStudent(Student students[], int& count)
 {
-    for (int i = 0; i < count; i++)
+    double total = 0;
+    cout << "Enter FName LName ID: ";
+    cin >> students[count].firstName >> students[count].lastName >> students[count].id;
+
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
     {
-        double sum = 0;
-
-        for (int j = 0; j < NUM_ASSIGNMENTS; j++)
-        {
-            sum += grades[i][j];
-        }
-
-        students[i].grade = sum / NUM_ASSIGNMENTS; // derived value
+        cout << "Enter A" << i + 1 << " mark: ";
+        cin >> students[count].assignments[i];
     }
-}
-
-// ================= UPDATE ASSIGNMENT =================
-// Finds a student by ID and overwrites a single assignment score
-void updateAssignment(double grades[][NUM_ASSIGNMENTS], Student students[], int count)
-{
-    int id, assignment;
-    double newGrade;
-
-    cout << "Enter student ID: ";
-    cin >> id;
-
-    cout << "Enter assignment (1-5): ";
-    cin >> assignment;
-
-    cout << "Enter new grade: ";
-    cin >> newGrade;
-
-    for (int i = 0; i < count; i++)
+    
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
     {
-        if (students[i].id == id)
-        {
-            grades[i][assignment - 1] = newGrade; // update single cell
-            cout << "Assignment updated!\n";
-            return;
-        }
+        total += students[count].assignments[i];
     }
+    students[count].average = total / NUM_ASSIGNMENTS;
 
-    cout << "Student not found.\n";
-}
-
-// ================= ADD STUDENT =================
-// Appends a new student to the array and initializes random grades for them
-void addStudent(Student students[], int& count, double grades[][NUM_ASSIGNMENTS])
-{
-    if (count >= MAX_STUDENTS) {
-
-        cout << "\nMAX reached, cannot add more students!!\n";
-
-        return;
-    }
-        
-
-    Student s;
-    s.grade = 0;
-
-    cout << "firstName, lastName, ID\n";
-    cin >> s.firstName >> s.lastName >> s.id;
-
-    students[count] = s;
-
-    // initialize grades row for new student
-    for (int j = 0; j < NUM_ASSIGNMENTS; j++)
+    for (int i = 0; i < NUM_COURSES; i++)
     {
-        grades[count][j] = rand() % 41 + 60;
+        cout << "Enter Course" << i + 1 << ": ";
+        cin >> students[count].courses[i];
     }
-
     count++;
-
-    cout << "\nStudent added!\n";
 }
 
-// ================= SAVE =================
-// Overwrites the text file with current student data from the array
+// ================= Save Student =================
 void saveStudents(Student students[], int count)
 {
-    ofstream outFile("students.txt");
-
-    for (int i = 0; i < count; i++)
-    {
-        outFile << students[i].firstName << " "
-            << students[i].lastName << " "
-            << students[i].id << " "
-            << students[i].grade << endl;
-    }
-
-    outFile.close();
-
-    cout << "\nData saved to file!\n";
-}
-
-// ================= HIGHLIGHT SEARCH =================
-// Searches and applies ANSI color codes to highlight a chosen row or column
-void highlightSearch(double grades[][NUM_ASSIGNMENTS], Student students[], int count)
-{
-    int choice;
-
-    cout << "\n1. Highlight Student (Row)\n";
-    cout << "2. Highlight Assignment (Column)\n";
-    cout << "Choice: ";
-    cin >> choice;
-
-    int targetRow = -1;
-    int targetCol = -1;
-
-    if (choice == 1)
-    {
-        int id;
-        cout << "Enter student ID: ";
-        cin >> id;
+        ofstream outFile("students90.txt");
 
         for (int i = 0; i < count; i++)
         {
-            if (students[i].id == id)
-            {
-                targetRow = i;
-                break;
-            }
+            outFile << students[i].firstName << " "
+                << students[i].lastName << " "
+                << students[i].id << " "
+                << students[i].assignments[0] << " "
+                << students[i].assignments[1] << " "
+                << students[i].assignments[2] << " "
+                << students[i].assignments[3] << " "
+                << students[i].assignments[4] << " "
+                << students[i].average << " "
+                << students[i].courses[0] << " "
+                << students[i].courses[1] << " "
+                << students[i].courses[2] << " \n";
         }
 
-        if (targetRow == -1)
-        {
-            cout << "Student not found.\n";
-            return;
-        }
-    }
-    else if (choice == 2)
-    {
-        cout << "Enter assignment (1-5): ";
-        cin >> targetCol;
-        targetCol--;
-    }
-    else
-    {
-        return;
-    }
+        outFile.close();
 
-    // ===== HEADER (match your display function exactly) =====
-    cout << "\n===== ALL STUDENT RECORDS =====\n";
-    cout << "\033[31mA" << "ID\tFName\t\tLName\t\t";
-
-    for (int j = 0; j < NUM_ASSIGNMENTS; j++)
-    {
-        cout << "A" << (j + 1) << "\t";
-    }
-
-    cout << "AVG \033[0m\n";
-
-    // ===== DATA ROWS =====
-    for (int i = 0; i < count; i++)
-    {
-        if (i == targetRow)
-            cout << "\033[33m";
-
-        cout << students[i].id << "\t"
-            << students[i].firstName << "      \t"
-            << students[i].lastName << "      \t";
-
-        for (int j = 0; j < NUM_ASSIGNMENTS; j++)
-        {
-            if (j == targetCol)
-                cout << "\033[33m" << grades[i][j] << "\033[0m\t";
-            else
-                cout << grades[i][j] << "\t";
-        }
-
-        // highlight AVG if row is targeted
-        if (i == targetRow)
-            cout << students[i].grade << "\033[0m\n";
-        else
-            cout << students[i].grade << endl;
-    }
+        cout << "\nData saved to file!\n";
 }

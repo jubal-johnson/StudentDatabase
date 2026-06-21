@@ -1,59 +1,79 @@
 #include "Student.h"
 
 // ================== DISPLAY ==================
-void displayStudents(Student students[], int count)
+void displayStudents(StudentNode* head)
 {
-    cout << "\nID\tLName\t\tFName\t\t";
+    cout << "\n"
+        << setw(8) << "ID"
+        << setw(15) << "LName"
+        << setw(15) << "FName";
 
     for (int j = 0; j < NUM_ASSIGNMENTS; j++)
-        cout << "A" << j + 1 << "\t";
+        cout << setw(6) << ("A" + to_string(j + 1));
 
-    cout << "AVG\tC1\tC2\tC3\n";
+    cout << setw(8) << "AVG"
+        << setw(10) << "C1"
+        << setw(10) << "C2"
+        << setw(10) << "C3"
+        << endl;
 
-    for (int i = 0; i < count; i++)
+    StudentNode* current = head;
+
+    while (current != nullptr)
     {
-        cout << students[i].id << "\t"
-            << students[i].lastName << "      \t"
-            << students[i].firstName << "      \t";
+        cout << setw(8) << current->data.id
+            << setw(15) << current->data.lastName
+            << setw(15) << current->data.firstName;
 
         for (int j = 0; j < NUM_ASSIGNMENTS; j++)
-            cout << students[i].assignments[j] << "\t";
+            cout << setw(6) << current->data.assignments[j];
 
-        cout << students[i].average << "\t";
+        cout << setw(8) << current->data.average;
 
         for (int j = 0; j < NUM_COURSES; j++)
-            cout << students[i].courses[j] << "\t";
+            cout << setw(10) << current->data.courses[j];
 
         cout << endl;
+
+        current = current->next; // move to next node
     }
 }
-
 // ================= Load Students =================
-void loadStudents(Student students[], int& count)
+void loadStudents(StudentNode*& head)
 {
-    ifstream inputFile("Students90.txt");
-
-    while (count < STUDENT_MAX &&
-        inputFile >> students[count].firstName
-        >> students[count].lastName
-        >> students[count].id)
-    {
-        for (int i = 0; i < NUM_ASSIGNMENTS; i++)
-        {
-            inputFile >> students[count].assignments[i];
-        }
-        
-        inputFile >> students[count].average;
-
-        for (int i = 0; i < NUM_COURSES; i++)
-        {
-            inputFile >> students[count].courses[i];
-        }
-
-        count++;
+    ifstream file("Students90.txt");
+    if (!file) {
+        cout << "Error opening file!" << endl;
+        return;
     }
 
-    inputFile.close();
+    // We no longer need a tail pointer tracking block here
+    Student tempStudent;
+
+    while (file >> tempStudent.firstName
+        >> tempStudent.lastName
+        >> tempStudent.id)
+    {
+        for (int j = 0; j < NUM_ASSIGNMENTS; j++)
+            file >> tempStudent.assignments[j];
+
+        file >> tempStudent.average;
+
+        for (int j = 0; j < NUM_COURSES; j++)
+            file >> tempStudent.courses[j];
+
+        // 1. Allocate a brand new node on the heap
+        StudentNode* newNode = new StudentNode();
+        newNode->data = tempStudent;
+
+        // 2. Point the new node's next to whatever the current head is pointing to
+        newNode->next = head;
+
+        // 3. Move the head pointer to point to our newly created node
+        head = newNode;
+    }
+
+    file.close();
 }
 
 // ================= Search by Course =================

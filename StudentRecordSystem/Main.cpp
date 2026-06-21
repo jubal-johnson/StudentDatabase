@@ -44,7 +44,6 @@ int main()
 		case 3:
 		{
 			showAssignmentAverage(students, count);
-			//...........
 			break;
 		}
 		case 4:

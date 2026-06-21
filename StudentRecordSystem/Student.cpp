@@ -229,11 +229,12 @@ void addStudent(Student students[], int& count)
         cin >> students[count].assignments[i];
     }
     
-    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
+    calculateAverage(&students[count]);
+    /*for (int i = 0; i < NUM_ASSIGNMENTS; i++)
     {
         total += students[count].assignments[i];
     }
-    students[count].average = total / NUM_ASSIGNMENTS;
+    students[count].average = total / NUM_ASSIGNMENTS;*/
 
     for (int i = 0; i < NUM_COURSES; i++)
     {
@@ -267,4 +268,18 @@ void saveStudents(Student students[], int count)
         outFile.close();
 
         cout << "\nData saved to file!\n";
+}
+
+// ================= Average of a student using pointer =================
+void calculateAverage(Student* s)
+{
+    double total = 0;
+
+    for (int i = 0; i < NUM_ASSIGNMENTS; i++)
+    {
+        total += s->assignments[i];
+    }
+
+    s->average = total / NUM_ASSIGNMENTS;
+
 }

@@ -29,7 +29,7 @@ struct Student
 void loadStudents(Student students[], int& count);
 void displayStudents(Student students[], int count);
 
-//void calculateAverage(Student* s);
+void calculateAverage(Student* s);
 //void calculateAllAverages(Student students[], int count);
 //
 void searchByCourse(Student students[], int count);
